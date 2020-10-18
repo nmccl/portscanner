@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+# Nick McClurg, 10/17/20
+
+# References
+# https://www.pythonforbeginners.com/code-snippets-source-code/port-scanner-in-python
+# https://www.studytonight.com/network-programming-in-python/building-a-port-scanner
+
+import socket
+import subprocess
+import sys
+import argparse
+from datetime import datetime
+
+# Clear screen
+subprocess.call('clear', shell=True)
+
+# While Loop allows for multiple hosts to be scanned 
+while 1:
+	# Input: Host
+	host    = raw_input("Enter a host/IP to scan or type 'exit': ")
+	
+	# Check for input 'exit' to close scanner
+	if host == 'exit':
+	    sys.exit()
+
+	hostIP  = socket.gethostbyname(host)
+
+	# Iuput: Port range
+	startPort = int(raw_input("Enter a start port: "))
+	endPort = int(raw_input("Enter an end port: "))
+
+	# Processing Banner
+	print "-" * 60
+	print "Host: ", host
+	print "Ports: ", startPort, "-", endPort
+	print "\nPlease wait while host ports are being scanned..."
+	print "-" * 60
+
+	# Start time of scan
+	t1 = datetime.now()
+
+	# Using the range function to specify ports (here it will scans all ports between 1 and 1024)
+
+	# We also put in some error handling for catching errors
+
+	try:
+	    for port in range(startPort,endPort):  
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		result = sock.connect_ex((hostIP, port))
+		
+		#For more than 50 results, just print the open ports
+		if ((endPort - startPort) >= 50):
+			if result == 0:
+			    print "Port {}:      	Open".format(port)
+		else:
+			if result == 0:
+			    print "Port {}:      	Open".format(port)
+			else:    
+			    print "Port {}:      	Closed".format(port)
+		sock.close()
+
+	except KeyboardInterrupt:
+	    sys.exit()
+
+	except socket.gaierror:
+	    print 'Hostname could not be resolved. Exiting scanner.'
+	    sys.exit()
+
+	except socket.error:
+	    print "Could not connect to server"
+	    sys.exit()
+
+	# End time of scan
+	t2 = datetime.now()
+
+	# Total time of scan
+	total =  t2 - t1
+
+	# Printing the information to screen
+	print "-" * 60
+	print 'Scanning on', host, 'for ports', startPort, '-', endPort, 'completed in: ', total
+	print "\n\n"
+
+
